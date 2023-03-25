@@ -3,6 +3,7 @@
 ## Linki:
 <ul>
 <li>Fanuc Py: https://github.com/torayeff/fanucpy</li>
+<li>Fanuc Py extended: https://github.com/Xevi8X/fanucpy_extended</li>
 </ul>
 
 ## Słownik pojęć:
