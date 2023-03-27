@@ -1,3 +1,3 @@
 [submodule "fanucpy_extended"]
-	path = fanucpy_extended
+	path = bin/submodules/fanucpy_extended
 	url = https://github.com/Xevi8X/fanucpy_extended

@@ -1,6 +1,6 @@
 from CommandProcessor import CommandProcessor
 from CommandExecutor import CommandExecutor
-from ..fanucpy_extended.src.fanucpy import Robot
+from submodules.fanucpy_extended import Robot
 
 if __name__ == "__main__":
 
