@@ -36,7 +36,7 @@ class CommandProcessor:
         actualGroup = []
         
         for elem in commands:
-            if elem[0] in MyUtils.commandPrefix():
+            if elem[0] in MyUtils.commandPrefix:
                 if len(actualGroup) > 0:
                     groups.append(actualGroup.copy())
                 actualGroup = [elem]
@@ -50,7 +50,7 @@ class CommandProcessor:
         command = Command()
         command.params = {}
         command.command_type = commandAndParam[0][0]
-        if not command.command_type in MyUtils.commandPrefix():
+        if not command.command_type in MyUtils.commandPrefix:
             command = self.lastCommand
         else:    
             command.command_no = int(commandAndParam[0][1:])
