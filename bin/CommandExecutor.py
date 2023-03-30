@@ -2,23 +2,35 @@ import logging
 from Command import Command
 from MyUtils import MyUtils
 from submodules.fanucpy_extended import Robot
+from Visualization import Visualization
+
 
 class CommandExecutor:
 
     dryRun: bool = True
     
     def __init__(self, robot: Robot | None) -> None:
-        if robot == None:
-            self.dryRun = True
         self.robot = robot
+        if self.robot == None:
+            self.dryRun = True
+        self.visualization = Visualization()
+        self.curPos = [0,0,0]
  
     def _handleGCommand(self, command: Command):
         match command.command_no:
             case 0:
                 logging.info("G0 - Fast move (quasilinear)")
+                self.curPos[0] = command.params.get("X",self.curPos[0])
+                self.curPos[1] = command.params.get("Y",self.curPos[1])
+                self.curPos[2] = command.params.get("Z",self.curPos[2])
+                self.visualization.addPoint(self.curPos[0],self.curPos[1],self.curPos[2])
                 pass
             case 1:
                 logging.info("G1 - Linear move")
+                self.curPos[0] = command.params.get("X",self.curPos[0])
+                self.curPos[1] = command.params.get("Y",self.curPos[1])
+                self.curPos[2] = command.params.get("Z",self.curPos[2])
+                self.visualization.addPoint(self.curPos[0],self.curPos[1],self.curPos[2])
                 pass
             case 2:
                 logging.info("G2 - Circular move CW")

@@ -2,6 +2,7 @@ import logging
 from CommandProcessor import CommandProcessor
 from CommandExecutor import CommandExecutor
 from submodules.fanucpy_extended import Robot
+from time import sleep
 
 if __name__ == "__main__":
 
@@ -20,7 +21,9 @@ if __name__ == "__main__":
 
     no,commands = processor.nextCommand()
     while no >= 0:
+        sleep(0.1)
         for command in commands:
             executor.execute(command)
         no,commands = processor.nextCommand()
+
             
