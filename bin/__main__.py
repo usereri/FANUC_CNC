@@ -16,14 +16,18 @@ if __name__ == "__main__":
     # )
     # robot.connect()
     
-    processor = CommandProcessor('test1.nc')
+    processor = CommandProcessor('test2.nc')
     executor = CommandExecutor(robot)
 
     no,commands = processor.nextCommand()
     while no >= 0:
-        sleep(0.1)
+        #sleep(0.1)
         for command in commands:
             executor.execute(command)
         no,commands = processor.nextCommand()
+    executor.draw()
+    #executor.test()
+    
+
 
             

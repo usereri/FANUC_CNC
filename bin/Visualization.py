@@ -14,6 +14,11 @@ class Visualization:
         self.plot_points[0].append(X)
         self.plot_points[1].append(Y)
         self.plot_points[2].append(Z)
+        #self.ax.plot(self.plot_points[0], self.plot_points[1], self.plot_points[2])
+        #plt.draw()
+        #plt.pause(0.1)
+
+    def draw(self):
         self.ax.plot(self.plot_points[0], self.plot_points[1], self.plot_points[2])
         plt.draw()
-        plt.pause(0.5)
+        plt.pause(999)
