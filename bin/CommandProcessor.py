@@ -50,7 +50,7 @@ class CommandProcessor:
         command = Command()
         command.params = {}
         command.command_type = commandAndParam[0][0]
-        if not command.command_type in MyUtils.commandPrefix:
+        if not command.command_type in MyUtils.commandPrefix :
             command = self.lastCommand
         else:    
             command.command_no = int(commandAndParam[0][1:])
@@ -59,7 +59,8 @@ class CommandProcessor:
             param_type = elem[0]
             param_val = float(elem[1:])
             command.params[param_type] = param_val
-        self.lastCommand = command.copy()
+        if command.command_type == "G" and command.command_no in [0,1,2,3]:
+            self.lastCommand = command.copy()
         return command
         
     def nextCommand(self) -> tuple[int,list[Command]]:

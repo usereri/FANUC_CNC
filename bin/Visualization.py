@@ -21,4 +21,6 @@ class Visualization:
     def draw(self):
         self.ax.plot(self.plot_points[0], self.plot_points[1], self.plot_points[2])
         plt.draw()
-        plt.pause(999)
+        plt.pause(0.001)
+        self.ax.cla()
+        #plt.pause(999)
