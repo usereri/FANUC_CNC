@@ -15,10 +15,12 @@ class CommandExecutor:
     curPos: list[float] = [0,0,0] 
     absolutePos = False
     zOffset = 0
+    FSpeeds: int = 10
+    orientation: list[float] = [0,0,0]
 
     
     def __init__(self, robot: Robot | None, visualization: bool = False) -> None:
-        self.robot = robot
+        self.robot : Robot | None = robot
         self.showVisualization = visualization
         if self.robot == None:
             self.dryRun = True
@@ -70,45 +72,91 @@ class CommandExecutor:
             # self.curPos[0] = endX
             # self.curPos[1] = endY
             # self.curPos[2] = command.params.get("Z",self.curPos[2])
+            assert(len(points)>= 2 and len(points) % 2 == 0)
             return points
+        
+        def setSpeed(command: Command):
+            if 'F' in command.params:
+                speed: int = command.params["F"] // 60
+                logging.info(f"Setting speed to {str(speed)} mm/s")
+                self.FSpeeds = speed
+
 
 
         match command.command_no:
 
             case 0:
                 logging.info("G0 - Fast move (quasilinear)")
+                setSpeed(command)
                 nextPoint = calcNextPoint(command)
-                #TODO
                 if self.showVisualization:
                     self.addToVisualization([nextPoint])
+                if not self.dryRun:
+                    self.robot.move(
+                        "pose",
+                        vals= nextPoint + self.orientation,
+                        velocity=self.FSpeeds,
+                        acceleration=100,
+                        cnt_val=0,
+                        linear=True,
+                    )
 
             case 1:
                 logging.info("G1 - Linear move")
+                setSpeed(command)
                 nextPoint = calcNextPoint(command)
-                #TODO
                 if self.showVisualization:
                     self.addToVisualization([nextPoint])
+                if not self.dryRun:
+                    self.robot.move(
+                        "pose",
+                        vals= nextPoint + self.orientation,
+                        velocity=self.FSpeeds,
+                        acceleration=100,
+                        cnt_val=0,
+                        linear=True,
+                    )
 
             case 2:
                 logging.info("G2 - Circular move CW")
+                setSpeed(command)
                 arcPoints = calcArcs(command,False)
-                #TODO
                 if self.showVisualization:
                     if self.smoothArcs:
                         self.circleCW(command)
                     else:
                         self.addToVisualization(arcPoints)
+                if not self.dryRun:
+                    noOfArcs: int = len(arcPoints)//2
+                    for i in range(noOfArcs):
+                        self.robot.circ(
+                            mid=arcPoints[2*i] + self.orientation,
+                            end=arcPoints[2*i+1] + self.orientation,
+                            velocity=self.FSpeeds,
+                            acceleration=100,
+                            cnt_val=0,
+                        )
                 self.curPos = arcPoints[-1]
 
             case 3:
                 logging.info("G3 - Circular move CCW")
+                setSpeed(command)
                 arcPoints = calcArcs(command,True)
-                #TODO
                 if self.showVisualization:
                     if self.smoothArcs:
                         self.circleCCW(command)
                     else:
                         self.addToVisualization(arcPoints)
+                if not self.dryRun:
+                    noOfArcs: int = len(arcPoints)//2
+                    for i in range(noOfArcs):
+                        self.robot.circ(
+                            mid=arcPoints[2*i] + self.orientation,
+                            end=arcPoints[2*i+1] + self.orientation,
+                            velocity=self.FSpeeds,
+                            acceleration=100,
+                            cnt_val=0,
+                        )
                 self.curPos = arcPoints[-1]
 
             case 17:
@@ -121,10 +169,22 @@ class CommandExecutor:
 
             case 28:
                 logging.info("G28 - Go home")
+                if not self.dryRun:
+                    lpos = self.robot.get_lpos()
+                    self.orientation = lpos[3:]
+                    logging.info(f"Setting orientation to {str(self.orientation[0])}, {str(self.orientation[1])}, {str(self.orientation[2])}")
                 nextPoint = calcNextPoint(command)
-                #TODO
                 if self.showVisualization:
                     self.addToVisualization([nextPoint])
+                if not self.dryRun:
+                    self.robot.move(
+                        "pose",
+                        vals= nextPoint + self.orientation,
+                        velocity=10,
+                        acceleration=100,
+                        cnt_val=0,
+                        linear=False,
+                    )
 
             #TODO: What is G40-G42
             case 40:
@@ -136,6 +196,7 @@ class CommandExecutor:
             case 43:
                 logging.info("G43 - Tool length compensation")
                 pass
+
             case 54:
                 logging.info("G54 - Active Coordinate System")
                 assertNoAttribute(command)
