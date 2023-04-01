@@ -11,7 +11,7 @@ class CommandExecutor:
 
     dryRun: bool = True
     showVisualization: bool = False
-    smoothArcs: bool = False
+    smoothArcs: bool = True
     curPos: list[float] = [0,0,0] 
     absolutePos = False
     zOffset = 0
