@@ -22,12 +22,13 @@ if __name__ == "__main__":
     executor = CommandExecutor(robot,True)
 
     no,commands = processor.nextCommand()
+    #executor.setZOffset(-10)
     while no >= 0:
         #sleep(1)
         for command in commands:
             executor.execute(command)
         no,commands = processor.nextCommand()
-    plt.pause(99)
+    plt.pause(1)
 
     if robot:
         robot.disconnect()

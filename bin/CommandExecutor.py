@@ -9,23 +9,38 @@ import numpy as np
 
 class CommandExecutor:
 
-    dryRun: bool = True
+    dryRun: bool = False
     showVisualization: bool = False
     smoothArcs: bool = True
+
     curPos: list[float] = [0,0,0] 
-    absolutePos = False
-    zOffset = 0
+    absolutePos: bool = False
+    zOffset: float = 0
+    baseSpeed :float = 600.0
     FSpeeds: int = 10
+    speed_factor: float = 0.1
     orientation: list[float] = [0,0,0]
 
     
-    def __init__(self, robot: Robot | None, visualization: bool = False) -> None:
-        self.robot : Robot | None = robot
+    def __init__(self, robot, visualization: bool = False) -> None:
+        self.robot = robot
         self.showVisualization = visualization
         if self.robot == None:
             self.dryRun = True
         if self.showVisualization:
             self.visualization = Visualization()
+
+    
+    def setSpeedFactor(self,speed_factor: float):
+        self.speed_factor = speed_factor
+        self.FSpeeds = int(self.baseSpeed*self.speed_factor/60.0)
+        if(self.FSpeeds < 1):
+            self.FSpeeds = 1 #mm/sek - almost nothing
+        logging.info(f"Setting output speed to {str(self.FSpeeds)} mm/sek")
+
+    def setZOffset(self, zOffset : float):
+        self.zOffset = zOffset
+        logging.info(f"Setting z-offset to {str(self.zOffset)} mm")
         
  
     def _handleGCommand(self, command: Command):
@@ -36,13 +51,19 @@ class CommandExecutor:
         def calcNextPoint(command: Command) -> list[float]:
             X = command.params.get("X",self.curPos[0])
             Y = command.params.get("Y",self.curPos[1])
-            Z = command.params.get("Z",self.curPos[2])
+            if "Z" in command.params:
+                Z = command.params["Z"]
+                if self.absolutePos:
+                    Z = Z + self.zOffset
+            else:
+                Z = self.curPos[2]
             if not self.absolutePos:
                 X = self.curPos[0] + command.params.get("X",0)
                 Y = self.curPos[1] + command.params.get("Y",0)
                 Z = self.curPos[2] + command.params.get("Z",0)
             # Z -= self.zOffset
             self.curPos = [X,Y,Z]
+            print(self.curPos)
             return self.curPos
         
         def calcArcs(command: Command, ccw: bool = False) -> list[list[float]]:
@@ -77,11 +98,10 @@ class CommandExecutor:
         
         def setSpeed(command: Command):
             if 'F' in command.params:
-                speed: int = command.params["F"] // 60
-                logging.info(f"Setting speed to {str(speed)} mm/s")
-                self.FSpeeds = speed
-
-
+                speed = command.params["F"]
+                logging.info(f"Setting base speed to {str(speed)} mm/min")
+                self.baseSpeed = speed
+                self.setSpeedFactor(self.speed_factor)
 
         match command.command_no:
 
