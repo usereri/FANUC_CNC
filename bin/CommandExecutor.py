@@ -37,6 +37,7 @@ class CommandExecutor:
         if(self.FSpeeds < 1):
             self.FSpeeds = 1 #mm/sek - almost nothing
         logging.info(f"Setting output speed to {str(self.FSpeeds)} mm/sek")
+        #add line to text box in GUI
 
     def setZOffset(self, zOffset : float):
         self.zOffset = zOffset
@@ -63,7 +64,6 @@ class CommandExecutor:
                 Z = self.curPos[2] + command.params.get("Z",0)
             # Z -= self.zOffset
             self.curPos = [X,Y,Z]
-            print(self.curPos)
             return self.curPos
         
         def calcArcs(command: Command, ccw: bool = False) -> list[list[float]]:
