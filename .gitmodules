@@ -1,3 +1,0 @@
-[submodule "bin/submodules/fanucpy_extended"]
-	path = bin/submodules/fanucpy_extended
-	url = git@github.com:Xevi8X/fanucpy_extended.git
